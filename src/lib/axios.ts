@@ -9,7 +9,11 @@ export const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
-    // Do something before request is sent
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     return config;
   },
@@ -71,7 +75,11 @@ axiosInstance.interceptors.response.use(
       try {
         const res = await axiosInstance.post("/auth/refresh-token");
         console.log("New Token arrived", res);
+        const newAccessToken = res.data?.accessToken;
 
+        if (newAccessToken) {
+          localStorage.setItem("accessToken", newAccessToken);
+        }
         processQueue(null);
 
         return axiosInstance(originalRequest);

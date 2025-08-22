@@ -16,9 +16,26 @@ import {
 } from "@/components/ui/table";
 import { DeleteConfirmation } from "@/components/DeleteConfirmation";
 import { toast } from "sonner";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import { useState } from "react";
 
 const AddTourType = () => {
-  const { data, isLoading, isError } = useGetTourTypesQuery(undefined);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { data, isLoading, isError } = useGetTourTypesQuery({
+    page: currentPage,
+    limit,
+  });
+
   const [removeTourType] = useRemoveTourTypeMutation();
 
   const handleDeleteTourType = async (tourId: string) => {
@@ -33,6 +50,8 @@ const AddTourType = () => {
       console.log(err);
     }
   };
+
+  const totalPage = data?.meta?.totalPage || 1;
 
   if (isLoading) return <p className="text-center py-6">Loading...</p>;
   if (isError)
@@ -91,6 +110,31 @@ const AddTourType = () => {
             ))}
           </TableBody>
         </Table>
+        {/* pagination */}
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                className={currentPage ===1 ? "pointer-events-none opacity-60" : "cursor-pointer"}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#">1</PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                className={currentPage === totalPage ? "pointer-events-none opacity-60" : "cursor-pointer"}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       </div>
     </div>
   );

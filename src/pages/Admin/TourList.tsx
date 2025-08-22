@@ -71,7 +71,7 @@ const TourList = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((item: { _id: string; name: string, description: string, thumbnail: string }, index: number) => (
+            {data?.map((item, index) => (
               <TableRow
                 key={item._id}
                 className="hover:bg-muted/30 transition-colors"
@@ -81,7 +81,7 @@ const TourList = () => {
                 </TableCell>
                
                 <TableCell className="font-medium text-foreground">
-                  {item?.name}
+                  {item?.title}
                 </TableCell>
                 <TableCell className="font-medium text-foreground">
                   {item?.description}

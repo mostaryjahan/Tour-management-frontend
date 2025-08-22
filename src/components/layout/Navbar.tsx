@@ -25,8 +25,9 @@ import { role } from "@/constants/role";
 const navigationLinks = [
   { href: "/", label: "Home", role: "PUBLIC" },
   { href: "/about", label: "About", role: "PUBLIC" },
+  { href: "/tours", label: "Tours", role: "PUBLIC" },
   { href: "/admin", label: "Dashboard", role: role.admin },
-    { href: "/admin", label: "Dashboard", role: role.superAdmin },
+  { href: "/admin", label: "Dashboard", role: role.superAdmin },
   { href: "/user", label: "Dashboard", role: role.user },
 ];
 
@@ -115,7 +116,7 @@ export default function Navbar() {
                         </NavigationMenuLink>
                       </NavigationMenuItem>
                     )}
-                     {link.role === data?.data?.role && (
+                    {link.role === data?.data?.role && (
                       <NavigationMenuItem key={index}>
                         <NavigationMenuLink
                           asChild

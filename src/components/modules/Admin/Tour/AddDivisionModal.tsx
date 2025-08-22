@@ -21,7 +21,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddDivisionMutation } from "@/redux/features/division/division.api";
-import { error } from "console";
 import { useState } from "react";
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
@@ -51,7 +50,7 @@ export function AddDivisionModal() {
       toast.success("Division Added");
       setOpen(false)
     }else{
-      console.log(error)
+      console.log(Error)
     }
   };
 

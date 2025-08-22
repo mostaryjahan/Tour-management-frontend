@@ -36,17 +36,19 @@ export function LoginForm({
         toast.success("Logged in successfully");
         navigate("/");
       }
-    } catch (err : any) {
+    } catch (err: unknown) {
       console.error(err);
 
-      if (err?.data?.message === "Password does not match") {
+      const error = err as { data?: { message?: string }; status?: number };
+
+      if (error?.data?.message === "Password does not match") {
         toast.error("Invalid credentials");
-      } else if (err?.data?.message === "User is not verified") {
+      } else if (error?.data?.message === "User is not verified") {
         toast.error("Your account is not verified");
         navigate("/verify", { state: data.email });
-      } else if (err?.data?.message === "Missing credentials") {
+      } else if (error?.data?.message === "Missing credentials") {
         toast.error("Please fill in all required fields");
-      } else if (err?.status === 401) {
+      } else if (error?.status === 401) {
         toast.error("Invalid email or password");
       } else {
         toast.error("Login failed. Please try again.");
@@ -116,9 +118,7 @@ export function LoginForm({
 
         {/*//* http://localhost:5000/api/v1/auth/google */}
         <Button
-          onClick=
-           {() => window.open(`${config.baseUrl}/auth/google`)}
-          
+          onClick={() => window.open(`${config.baseUrl}/auth/google`)}
           type="button"
           variant="outline"
           className="w-full cursor-pointer"

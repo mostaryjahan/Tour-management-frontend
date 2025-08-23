@@ -10,7 +10,7 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   function (config) {
     // Skip adding token for auth endpoints
-    const authEndpoints = ['/auth/login', '/auth/register', '/user/register', '/otp/send', '/otp/verify'];
+    const authEndpoints = ['/auth/login', '/user/register', '/otp/send', '/otp/verify'];
     const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
     
     if (!isAuthEndpoint) {

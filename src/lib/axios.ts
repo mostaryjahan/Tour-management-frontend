@@ -9,8 +9,16 @@ export const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
-    // Since we're using cookies, no need to add Authorization headers
-    // The withCredentials: true will handle cookie authentication
+    // Skip adding token for auth endpoints
+    const authEndpoints = ['/auth/login', '/user/register', '/otp/send', '/otp/verify'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
+    
+    if (!isAuthEndpoint) {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      }
+    }
     return config;
   },
   function (error) {
@@ -71,7 +79,11 @@ axiosInstance.interceptors.response.use(
       try {
         const res = await axiosInstance.post("/auth/refresh-token");
         console.log("New Token arrived", res);
-        // Cookie will be automatically updated by the server
+        const newAccessToken = res.data?.data?.accessToken || res.data?.accessToken;
+
+        if (newAccessToken) {
+          localStorage.setItem("accessToken", newAccessToken);
+        }
         processQueue(null);
 
         return axiosInstance(originalRequest);

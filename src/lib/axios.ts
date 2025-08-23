@@ -9,7 +9,16 @@ export const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
-    // Do something before request is sent
+    // Skip adding token for auth endpoints
+    const authEndpoints = ['/auth/login', '/user/register', '/otp/send', '/otp/verify'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
+    
+    if (!isAuthEndpoint) {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers.set('Authorization', token);
+      }
+    }
     return config;
   },
   function (error) {
@@ -19,6 +28,7 @@ axiosInstance.interceptors.request.use(
 );
 
 let isRefreshing = false;
+
 let pendingQueue: {
   resolve: (value: unknown) => void;
   reject: (value: unknown) => void;
@@ -42,10 +52,11 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error) => {
-    // console.log("Request Failed", error.response);
+    // console.log("Request failed", error.response.data.message);
 
-    const originalRequest = error.config as AxiosRequestConfig & {_retry: boolean};
-    // console.log(originalRequest);
+    const originalRequest = error.config as AxiosRequestConfig & {
+      _retry: boolean;
+    };
 
     if (
       error.response.status === 500 &&
@@ -63,23 +74,28 @@ axiosInstance.interceptors.response.use(
           .then(() => axiosInstance(originalRequest))
           .catch((error) => Promise.reject(error));
       }
+
       isRefreshing = true;
       try {
         const res = await axiosInstance.post("/auth/refresh-token");
-        console.log("New token arrived", res);
+        console.log("New Token arrived", res);
+        const newAccessToken = res.data?.data?.accessToken || res.data?.accessToken;
 
+        if (newAccessToken) {
+          localStorage.setItem("accessToken", newAccessToken);
+        }
         processQueue(null);
 
         return axiosInstance(originalRequest);
       } catch (error) {
-        console.log(error);
         processQueue(error);
         return Promise.reject(error);
       } finally {
         isRefreshing = false;
       }
     }
-    // For Everything
+
+    //* For Everything
     return Promise.reject(error);
   }
 );

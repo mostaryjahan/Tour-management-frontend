@@ -34,9 +34,6 @@ export function LoginForm({
       const res = await login(data).unwrap();
 
       if (res.success) {
-         if (res.data?.accessToken) {
-        localStorage.setItem("accessToken", res.data.accessToken);
-      }
         toast.success("Logged in successfully");
         navigate("/");
       }

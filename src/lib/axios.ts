@@ -9,9 +9,15 @@ export const axiosInstance = axios.create({
 // Add a request interceptor
 axiosInstance.interceptors.request.use(
   function (config) {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
+    // Skip adding token for auth endpoints
+    const authEndpoints = ['/auth/login', '/auth/register', '/user/register', '/otp/send', '/otp/verify'];
+    const isAuthEndpoint = authEndpoints.some(endpoint => config.url?.includes(endpoint));
+    
+    if (!isAuthEndpoint) {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers.set('Authorization', `Bearer ${token}`);
+      }
     }
 
     return config;
